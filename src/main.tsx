@@ -5,10 +5,12 @@ import App from './App.tsx';
 import './index.css';
 import { AuthProvider } from './context/AuthContext';
 import { CardApplicationProvider } from './context/CardApplicationContext';
+import ScrollToTop from "./components/ScrollToTop";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <CardApplicationProvider>
           <App />

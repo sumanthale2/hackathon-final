@@ -1,8 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { useCardApplication } from '../context/CardApplicationContext';
-import { useAuth } from '../context/AuthContext';
-import { selectedCardData } from '../data/cardsData';
-import { CheckCircle } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { useCardApplication } from "../context/CardApplicationContext";
+import { useAuth } from "../context/AuthContext";
+import { selectedCardData } from "../data/cardsData";
+import { CheckCircle } from "lucide-react";
 
 function CardApplicationThankYou() {
   const navigate = useNavigate();
@@ -12,19 +12,12 @@ function CardApplicationThankYou() {
 
   const handleOkay = () => {
     resetApplication();
-    if (user && user.type === 'new') {
-      navigate('/dashboard/new');
-    } else if (user && user.type === 'existing') {
-      navigate('/dashboard/existing');
-    } else {
-      navigate('/cards');
-    }
+    navigate("/dashboard/new");
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center px-6 py-16">
       <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl border border-slate-200 p-12 text-center">
-
         {/* Success Icon */}
         <div className="flex justify-center mb-8">
           <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center border border-green-200 shadow-sm">
@@ -50,9 +43,9 @@ function CardApplicationThankYou() {
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8 mb-10 text-left shadow-sm">
           <p className="text-slate-800 text-lg leading-relaxed">
             Thank you for applying for the{" "}
-            <span className="font-semibold">{card?.title}</span>.
-            You will receive a written explanation within 10 business days.
-            If a valid email address was provided, you may receive a response
+            <span className="font-semibold">{card?.title}</span>. You will
+            receive a written explanation within 10 business days. If a valid
+            email address was provided, you may receive a response
             electronically within 3–4 business days.
           </p>
 
@@ -95,7 +88,6 @@ function CardApplicationThankYou() {
         >
           Continue
         </button>
-
       </div>
     </div>
   );

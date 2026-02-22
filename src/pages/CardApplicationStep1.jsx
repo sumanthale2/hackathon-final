@@ -1,25 +1,37 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCardApplication } from '../context/CardApplicationContext';
 import { selectedCardData } from '../data/cardsData';
 import CardApplicationLayout from '../components/CardApplicationLayout';
-import { Info, Lock } from 'lucide-react';
+import { Info, Lock, Loader2 } from 'lucide-react';
 
 function CardApplicationStep1() {
   const navigate = useNavigate();
-  const { applicationData, updateApplicationData, nextStep, previousStep } = useCardApplication();
+  const { applicationData, updateApplicationData, nextStep, previousStep } =
+    useCardApplication();
   const card = selectedCardData[applicationData.selectedCard];
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const simulateFetchAndNavigate = (route) => {
+    setIsLoading(true);
+
+    // Simulate database verification delay
+    setTimeout(() => {
+      nextStep();
+      navigate(route);
+    }, 2000);
+  };
 
   const handleContinue = () => {
     if (applicationData.ssn && applicationData.phone) {
-      nextStep();
-      navigate('/apply-card/step2');
+      simulateFetchAndNavigate('/apply-card/step2');
     }
   };
 
   const handleNoPhoneClick = () => {
     updateApplicationData({ phone: 'NO_PHONE' });
-    nextStep();
-    navigate('/apply-card/step2');
+    simulateFetchAndNavigate('/apply-card/step2');
   };
 
   const handleBack = () => {
@@ -34,6 +46,21 @@ function CardApplicationStep1() {
       onBack={handleBack}
       cardTitle={card?.title}
     >
+      {/* Loader Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 text-center">
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto mb-4" />
+            <p className="text-slate-800 font-medium">
+              Verifying your information…
+            </p>
+            <p className="text-slate-500 text-sm mt-1">
+              Fetching secure records from our database
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Header Section */}
       <div className="text-center mb-12">
         <div className="inline-flex items-center justify-center p-4 rounded-2xl bg-white shadow-lg border border-gray-100 mb-6">
@@ -55,15 +82,6 @@ function CardApplicationStep1() {
       {/* Notices */}
       <div className="space-y-4 mb-10">
 
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm">
-          <p className="text-blue-900 text-sm leading-relaxed">
-            Please review our{" "}
-            <span className="font-semibold underline cursor-pointer">
-              Terms & Conditions
-            </span>{" "}
-            before proceeding.
-          </p>
-        </div>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start space-x-3 shadow-sm">
           <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -110,7 +128,8 @@ function CardApplicationStep1() {
             onChange={(e) => updateApplicationData({ ssn: e.target.value })}
             placeholder="••••"
             maxLength="4"
-            className="w-full px-5 py-3.5 border border-slate-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200 shadow-sm"
+            disabled={isLoading}
+            className="w-full px-5 py-3.5 border border-slate-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200 shadow-sm disabled:bg-slate-100"
           />
 
           <p className="text-slate-500 text-xs mt-3 leading-relaxed">
@@ -129,12 +148,9 @@ function CardApplicationStep1() {
             value={applicationData.phone}
             onChange={(e) => updateApplicationData({ phone: e.target.value })}
             placeholder="(555) 123-4567"
-            className="w-full px-5 py-3.5 border border-slate-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200 shadow-sm"
+            disabled={isLoading}
+            className="w-full px-5 py-3.5 border border-slate-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200 shadow-sm disabled:bg-slate-100"
           />
-
-          <p className="text-slate-500 text-xs mt-3 leading-relaxed">
-            You consent to receive a one-time verification text message. Standard messaging rates may apply.
-          </p>
         </div>
 
       </div>
@@ -149,24 +165,23 @@ function CardApplicationStep1() {
 
       {/* Actions */}
       <div className="space-y-4">
-
         <button
           onClick={handleContinue}
-          disabled={!applicationData.ssn || !applicationData.phone}
-          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 disabled:from-slate-300 disabled:to-slate-300 text-slate-900 font-semibold py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 disabled:cursor-not-allowed"
+          disabled={!applicationData.ssn || !applicationData.phone || isLoading}
+          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 disabled:from-slate-300 disabled:to-slate-300 text-slate-900 font-semibold py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          Continue
+          {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
+          {isLoading ? 'Verifying...' : 'Continue'}
         </button>
 
         <button
           onClick={handleNoPhoneClick}
-          className="w-full text-slate-600 hover:text-slate-900 font-medium py-3 transition"
+          disabled={isLoading}
+          className="w-full text-slate-600 hover:text-slate-900 font-medium py-3 transition disabled:opacity-50"
         >
           I don’t have a mobile phone number
         </button>
-
       </div>
-
     </CardApplicationLayout>
   );
 }
